@@ -28,7 +28,7 @@ var app = angular.module('demo', [])
                 }).then(function (response) {
                     console.log($scope.file + " Successfully processed");
                     console.log("Response: " + response.data);
-                    $scope.convertedCSV = response.data;
+                    //$scope.convertedCSV = response.data;
                 });
             }
         };

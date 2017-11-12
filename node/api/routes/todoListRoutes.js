@@ -5,8 +5,12 @@ var todoList = require('../controllers/todoListController');
 module.exports = function(app) {
 
     // todoList Routes
-    app.route('/tasks')
-        .get(todoList.list_all_tasks);
+    app.route('/files')
+        .get(todoList.list_all_files);
+    app.route('/files/day')
+        .get(todoList.list_day_files);
+    app.route('/files/vendor')
+        .get(todoList.list_vendor_files);
         //.post(todoList.create_a_task);
 
 /*
