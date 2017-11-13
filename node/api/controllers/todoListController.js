@@ -1,7 +1,6 @@
 'use strict';
 
 var fs = require('fs');
-var async = require('async');
 var path = require('path');
 var csv = require('fast-csv');
 var mongoose = require('mongoose');
@@ -67,13 +66,14 @@ exports.list_all_files = function(req, res) {
     {
         if (err)
             res.send(err);
-        res.json(daytotal);
+        res.contentType('application/json');
+        res.send(daytotal);
     });
 };
 
-exports.list_day_files = function(req, res) {
+exports.list_date_vendors = function(req, res) {
     var dateVendors = [];
-    var date = req.headers['date'];
+    var date = req.headers['dstring'];
     console.log("DateHeader :" + date);
     DayTotal.find({ date: date}).select('vendor').exec(function(err, daytotal)
     {
@@ -82,11 +82,13 @@ exports.list_day_files = function(req, res) {
         daytotal.forEach(function(item) {
             dateVendors.push(item.vendor);
         });
-        res.json(dateVendors);
+        var vendors = {dateVendors: dateVendors};
+        res.contentType('application/json');
+        res.send(vendors);
     });
 };
 
-exports.list_vendor_files = function(req, res) {
+exports.list_vendor_dates = function(req, res) {
     var vendorDates = [];
     var vendor = req.headers['vendor'];
     console.log("VendorHeader :" + vendor);
@@ -97,7 +99,23 @@ exports.list_vendor_files = function(req, res) {
         daytotal.forEach(function(item) {
             vendorDates.push(item.date);
         });
-        res.json(vendorDates);
+        var dates = {vendorDates: vendorDates};
+        res.contentType('application/json');
+        res.send(dates);
+    });
+};
+
+exports.get_single_file = function(req, res) {
+    var date = req.headers['dstring'];
+    var vendor = req.headers['vendor'];
+    console.log("DB_Date :" + date);
+    console.log("DB_Vendor :" + vendor);
+    DayTotal.find({ date: date, vendor: vendor}).select('date vendor terminals').exec(function(err, daytotal)
+    {
+        if (err)
+            res.send(err);
+        res.contentType('application/json');
+        res.send(daytotal);
     });
 };
 
@@ -196,8 +214,8 @@ exports.processCSV = function(req, res) {
 function getDateString() {
     var date = new Date();
     var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
+    var month = ('0' + (date.getMonth() + 1)).slice(-2);
+    var day = ('0' + (date.getDate())).slice(-2);
     console.log("Date String: " + year + "_" + month + "_" + day);
     return(year + "_" + month + "_" + day);
 }
